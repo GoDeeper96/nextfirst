@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { getPivotDataSource, runDynamicQuery3, transformarObjetos } from "../../utils/funcionesParaCalcularCubo";
 import dbConnect from "../../lib/mongodb";
 import b2bventas2Model from "../../models/b2bventas2.model";
+import { InitClientRedisOtherOther } from "../../lib/redis";
 
 export default async function  handler(req, res) {
       // Permitir CORS
@@ -24,11 +25,7 @@ export default async function  handler(req, res) {
         console.log('qwdqwd')
         const { Filas,Columnas,Filtros,Valores } = req.body
             try {
-                // console.log(req.body)
-                // console.log(Valores)
-                // const formattedData = transformarObjetos(Valores.Valores);
-                // // console.log(Filtros)
-                // console.log(formattedData)
+
                 const query = {
                     rows: Filas,
                     // ['Periodo','Sucursal']
@@ -44,23 +41,41 @@ export default async function  handler(req, res) {
                     filters: { PKIDProveedor: '90005' }
                     // filters: { PKIDProveedor: '90005' }
                 };
-                // console.log(formattedData)
-                console.log(query)
-                console.log(JSON.stringify(query))
-                const Pipelina = runDynamicQuery3(query)
-                console.log(JSON.stringify(Pipelina))
-                console.log(Pipelina)
-                // console.log(Pipelina[0])
-                // const test = await b2bventas2Model.find({}).limit(10)
-                // console.log(test)
-                const FiltracionMaxima = await b2bventas2Model.aggregate(Pipelina)
-               
-                const pivotDataSource = getPivotDataSource(query,FiltracionMaxima)
-                // console.log(FiltracionMaxima)
-                res.status(200).json({
+                const sd = await InitClientRedisOtherOther().connect()
+                const dataRedisExisteConQuery = await sd.v4.GET(`${JSON.stringify(query)}`)
+                console.log(dataRedisExisteConQuery)
+                if(!dataRedisExisteConQuery)
+                {
+                    // console.log(formattedData)
+                                    
+                    console.log(query)
+                    console.log(JSON.stringify(query))
+                    const Pipelina = runDynamicQuery3(query)
+                    console.log(JSON.stringify(Pipelina))
+                    console.log(Pipelina)
+                    // console.log(Pipelina[0])
+                    // const test = await b2bventas2Model.find({}).limit(10)
+                    // console.log(test)
+                    const FiltracionMaxima = await b2bventas2Model.aggregate(Pipelina)
+                    if(FiltracionMaxima.length!==0)
+                    {
+                      
+                      await sd.set(`${JSON.stringify(query)}`,JSON.stringify(FiltracionMaxima))
+                    }
+                    const pivotDataSource = getPivotDataSource(query,FiltracionMaxima)
+                    // console.log(FiltracionMaxima)
+                    res.status(200).json({
+                        pivotDataSource:pivotDataSource,
+                        pipeline:Pipelina
+                    })
+                }
+                else{
+                  const pivotDataSource = getPivotDataSource(query,JSON.parse(dataRedisExisteConQuery))
+                  res.status(200).json({
                     pivotDataSource:pivotDataSource,
-                    pipeline:Pipelina
+                    pipeline:{}
                 })
+                }
             
            
     
