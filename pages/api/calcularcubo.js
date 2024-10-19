@@ -43,16 +43,16 @@ export default async function  handler(req, res) {
                 };
                 const sd = await InitClientRedisOtherOther().connect()
                 const dataRedisExisteConQuery = await sd.v4.GET(`${JSON.stringify(query)}`)
-                console.log(dataRedisExisteConQuery)
+                // console.log(dataRedisExisteConQuery)
                 if(!dataRedisExisteConQuery)
                 {
                     // console.log(formattedData)
                                     
-                    console.log(query)
-                    console.log(JSON.stringify(query))
+                    // console.log(query)
+                    // console.log(JSON.stringify(query))
                     const Pipelina = runDynamicQuery3(query)
-                    console.log(JSON.stringify(Pipelina))
-                    console.log(Pipelina)
+                    // console.log(JSON.stringify(Pipelina))
+                    // console.log(Pipelina)
                     // console.log(Pipelina[0])
                     // const test = await b2bventas2Model.find({}).limit(10)
                     // console.log(test)
