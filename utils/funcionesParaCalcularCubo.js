@@ -43,17 +43,33 @@ export function transformarObjetos(arreglo) {
         return 'Sum'; // Por defecto, asumimos Sum
     }
   };
+  function transformQuery(originalQuery) {
+    // Creamos un nuevo array con las condiciones para $and
+    const transformedQuery = {
+      $match: {
+        $and: Object.entries(originalQuery).map(([key, value]) => ({
+          [key]: value
+        }))
+      }
+    };
+  
+    return transformedQuery;
+  }
+  
   export function runDynamicQuery3(query) {
     // Construir la etapa $match para los filtros
-    const matchCondition = {};
+    let matchCondition ={};
+    console.log(query.filters)
     if (query.filters && query.filters.length > 0) {
-      query.filters.forEach(filtro => {
-        const fieldName = filtro.Filtro.split('-')[0];
-        const value = filtro.ValorFiltro;
-        matchCondition[fieldName] = value;
-      });
+       matchCondition = transformQuery(query.filters);
+      console.log(matchCondition)
+      // query.filters.forEach(filtro => {
+      //   const fieldName = filtro.Filtro.split('-')[0];
+      //   const value = filtro.ValorFiltro;
+      //   matchCondition[fieldName] = value;
+      // });
     }
-    const matchStage = { $match: matchCondition };
+    const matchStage = transformQuery(query.filters);
   
     // Construir la etapa $group para las filas, columnas y valores
     const groupFields = {};

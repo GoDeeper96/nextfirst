@@ -206,7 +206,9 @@ const esquemaVentas = new mongoose.Schema({
       required: false,
       index: true
     }
-  });
+  },
+
+);
 // const VentaSchema = new mongoose.Schema({
 //     Periodo: {
 //         type: String,
@@ -351,9 +353,9 @@ const esquemaVentas = new mongoose.Schema({
 //     // collection:'ventas'
 // }
 // );
-const b2bventas2Model = mongoose.models['b2b_version'] 
-? mongoose.model('b2b_version') 
-: mongoose.model('b2b_version', esquemaVentas);
+const b2bventas2Model = mongoose.models['90005'] 
+? mongoose.model('90005') 
+: mongoose.model('90005', esquemaVentas);
 
 export default b2bventas2Model
 // export default b2bventas2Model

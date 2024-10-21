@@ -26,37 +26,48 @@ export default async function  handler(req, res) {
         const { Filas,Columnas,Filtros,Valores } = req.body
             try {
 
-                const query = {
-                    rows: Filas,
-                    // ['Periodo','Sucursal']
-                    columns: Columnas,
-                    // ['Periodo','Sucursal']
-                    values: Valores,
-                    // {
+                // const query = {
+                //     // rows: Filas,
+                //     rows: ['Periodo'],
+                //     // ['Periodo','Sucursal']
+                //     // columns: Columnas,
+                //     columns: ['Sucursal'],
+                //     // ['Periodo','Sucursal']
+                //     // values: Valores,
+                //     // values: Valores,
+                //     values: 
+                //     {
                         
-                    // //   COBERTURA: { operation: 'COUNT', distinct: true },
-                    // //   PEDIDOS: { operation: 'COUNT' },
-                    //   ValorVenta: { operation: 'SUM' }
-                    // },
-                    filters: { PKIDProveedor: '90005' }
-                    // filters: { PKIDProveedor: '90005' }
-                };
+                //     //   COBERTURA: { operation: 'COUNT', distinct: true },
+                //     //   PEDIDOS: { operation: 'COUNT' },
+                //       ValorVenta: { operation: 'SUM' }
+                //     },
+                //     filters: { PKIDProveedor: '90005' }
+                //     // filters: { PKIDProveedor: '90005' }
+                // };
+                const query = {
+                  rows: Filas,
+                  columns: Columnas,
+                  values: Valores,
+                  filters: Filtros
+              };
                 const sd = await InitClientRedisOtherOther().connect()
                 const dataRedisExisteConQuery = await sd.v4.GET(`${JSON.stringify(query)}`)
                 // console.log(dataRedisExisteConQuery)
                 if(!dataRedisExisteConQuery)
                 {
                     // console.log(formattedData)
-                                    
+                    
                     // console.log(query)
                     // console.log(JSON.stringify(query))
                     const Pipelina = runDynamicQuery3(query)
-                    // console.log(JSON.stringify(Pipelina))
+                    console.log(JSON.stringify(Pipelina))
                     // console.log(Pipelina)
                     // console.log(Pipelina[0])
                     // const test = await b2bventas2Model.find({}).limit(10)
                     // console.log(test)
                     const FiltracionMaxima = await b2bventas2Model.aggregate(Pipelina)
+                    // console.log(FiltracionMaxima)
                     if(FiltracionMaxima.length!==0)
                     {
                       
