@@ -2,16 +2,15 @@
 FROM node:18-alpine
 
 # Establecer el directorio de trabajo en /app
-WORKDIR /app
+WORKDIR /app/api1
 
 # Copiar los archivos de package.json y package-lock.json
-COPY package*.json ./
-
+COPY ./api1/package*.json ./
 # Instalar las dependencias del proyecto
 RUN npm install --frozen-lockfile
 
 # Copiar el resto de los archivos del proyecto
-COPY . .
+COPY ./api1 .
 
 # Construir la aplicación Next.js
 RUN npm run build

@@ -353,9 +353,9 @@ const esquemaVentas = new mongoose.Schema({
 //     // collection:'ventas'
 // }
 // );
-const b2bventas2Model = mongoose.models['90005'] 
-? mongoose.model('90005') 
-: mongoose.model('90005', esquemaVentas);
+const b2bventas2Model = mongoose.models['1234'] 
+? mongoose.model('1234') 
+: mongoose.model('1234', esquemaVentas);
 
 export default b2bventas2Model
 // export default b2bventas2Model
