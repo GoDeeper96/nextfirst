@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { getPivotDataSource, runDynamicQuery3, transformarObjetos } from "../../utils/funcionesParaCalcularCubo";
+import { getPivotDataSource, runDynamicQuery3, runDynamicQuery4, runDynamicQuery5, runDynamicQuery5_actual, runDynamicQuery6_actual, transformarObjetos } from "../../utils/funcionesParaCalcularCubo";
 import dbConnect from "../../lib/mongodb";
 import b2bventas2Model from "../../models/b2bventas2.model";
 import { InitClientRedisOtherOther } from "../../lib/redis";
@@ -23,7 +23,7 @@ export default async function  handler(req, res) {
     else if(req.method==='POST')
     {
         console.log('qwdqwd')
-        const { Filas,Columnas,Filtros,Valores } = req.body
+        const { Filas,Columnas,Filtros,Valores,PanelFiltros } = req.body
             try {
 
                 // const query = {
@@ -52,6 +52,7 @@ export default async function  handler(req, res) {
                   filters: Filtros
               };
                 const sd = await InitClientRedisOtherOther().connect()
+                console.log(JSON.stringify(query))
                 const dataRedisExisteConQuery = await sd.v4.GET(`${JSON.stringify(query)}`)
                 // console.log(dataRedisExisteConQuery)
                 if(!dataRedisExisteConQuery)
@@ -60,7 +61,8 @@ export default async function  handler(req, res) {
                     
                     // console.log(query)
                     // console.log(JSON.stringify(query))
-                    const Pipelina = runDynamicQuery3(query)
+                    const Pipelina = runDynamicQuery6_actual(query)
+                    
                     console.log(JSON.stringify(Pipelina))
                     // console.log(Pipelina)
                     // console.log(Pipelina[0])
@@ -73,17 +75,19 @@ export default async function  handler(req, res) {
                       
                       await sd.set(`${JSON.stringify(query)}`,JSON.stringify(FiltracionMaxima))
                     }
+                    console.time('TIEMPOCALCULO')
                     const pivotDataSource = getPivotDataSource(query,FiltracionMaxima)
                     // console.log(FiltracionMaxima)
+                    console.timeEnd('TIEMPOCALCULO')
                     res.status(200).json({
-                        pivotDataSource:pivotDataSource,
+                        pivotDataSource:{...pivotDataSource,PanelFiltros},
                         pipeline:Pipelina
                     })
                 }
                 else{
                   const pivotDataSource = getPivotDataSource(query,JSON.parse(dataRedisExisteConQuery))
                   res.status(200).json({
-                    pivotDataSource:pivotDataSource,
+                    pivotDataSource:{...pivotDataSource,PanelFiltros},
                     pipeline:{}
                 })
                 }
